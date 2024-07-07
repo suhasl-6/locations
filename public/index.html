@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Tracking</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHqxi71Tf0UxFY2c3MD0uPZqscXiWc7dU",
+            databaseURL:"https://womensafety-70e25.firebaseio.com",
+            projectId: "womensafety-70e25",
+            storageBucket: "womensafety-70e25.appspot.com",
+            messagingSenderId: "294619325198",
+            appId: "1:294619325198:android:49afb342dcb235d9672d5f"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Initialize Leaflet map
+        const map = L.map('map').setView([0, 0], 13);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Marker for the user's location
+        const marker = L.marker([0, 0]).addTo(map);
+
+        // Fetch real-time location data from Firebase
+        const sessionId = "YOUR_SESSION_ID"; // Get the session ID from the URL or another source
+        database.ref('locations/' + sessionId).on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const lat = data.latitude;
+                const lng = data.longitude;
+                const latLng = [lat, lng];
+                marker.setLatLng(latLng);
+                map.setView(latLng);
+            }
+        });
+    </script>
+</body>
+</html>
